@@ -1,29 +1,30 @@
 FROM ruby:2.5.1-alpine3.7
 
-# consoleで日本語入力を許可
-ENV LANG C.UTF-8
+RUN set -ex \
+        && apk update \
+        && apk upgrade \
+        && apk add --no-cache  \
+            build-base \
+            bash \
+            curl \
+            nodejs \
+            tzdata \
+            mariadb \
+            mariadb-client \
+            mariadb-dev \
+            openrc \
+        # Setup mariadb (mysql)
+        && mkdir -p /run/openrc \
+        && touch /run/openrc/softlevel \
+        && rc-status \
+        && /etc/init.d/mariadb setup \
+        && gem install bundler
 
-RUN apk update && \
-    apk upgrade && \
-    apk add --no-cache \
-        build-base \
-        libxml2-dev \
-        libxslt-dev \
-        mysql-dev \
-        bash \
-        curl \
-        git \
-        nodejs \
-        tzdata
-
-RUN gem install bundler
-
-WORKDIR /app
+WORKDIR /web
 
 COPY Gemfile Gemfile
 COPY Gemfile.lock Gemfile.lock
 RUN bundle install
 
 ADD . .
-
-EXPOSE 3000
+RUN chmod +x /web/rspec.sh
