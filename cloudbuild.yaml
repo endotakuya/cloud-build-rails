@@ -1,0 +1,7 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/cloud-build-rails', '.']
+- name: 'gcr.io/$PROJECT_ID/cloud-build-rails'
+  args: ['/bin/bash', '/web/rspec.sh']
+
+images: ['gcr.io/$PROJECT_ID/cloud-build-rails']
